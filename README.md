@@ -1,6 +1,6 @@
 # tube
 
-A very small place to put a video and send someone a link to it. One Node
+A very small place to put a video and send someone a link to it. One Rust
 service on Cloud Run serves a single page and signs URLs into a private
 bucket; the browser streams the video straight from storage. Nothing is
 listed anywhere, so a link is the only way in.
@@ -34,10 +34,12 @@ Copy `.env.example` to `.env` and fill it in. Then:
 ./deploy.sh add film.mp4 "Some film"  # upload a video, print its link
 ```
 
-To run locally, point `TUBE_KEY` at a signer key file:
+To run locally, point `TUBE_KEY` at a signer key file. The one in
+`testdata/` is a throwaway that signs links no bucket will honour, but it
+is enough to see the page:
 
 ```bash
-TUBE_BUCKET=BUCKET TUBE_KEY=key.json node server.js
+TUBE_BUCKET=BUCKET TUBE_KEY=key.json cargo run
 ```
 
 ## Videos

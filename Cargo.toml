@@ -1,0 +1,10 @@
+[package]
+name = "tube"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rsa = { version = "0.9", features = ["sha2"] }
+
+[profile.release]
+strip = true
