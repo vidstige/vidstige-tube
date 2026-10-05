@@ -25,13 +25,12 @@ gcloud secrets create SECRET --data-file=key.json
 rm key.json
 ```
 
-## Running it
+## Deploying it
 
 Copy `.env.example` to `.env` and fill it in. Then:
 
 ```bash
-./deploy.sh                           # deploy the page
-./deploy.sh add film.mp4 "Some film"  # upload a video, print its link
+./deploy.sh
 ```
 
 To run locally, point `TUBE_KEY` at a signer key file. The one in
@@ -42,7 +41,11 @@ is enough to see the page:
 TUBE_BUCKET=BUCKET TUBE_KEY=key.json cargo run
 ```
 
-## Videos
+## Uploading videos
+
+```bash
+./upload.sh film.mp4 "Some film"   # prints the link
+```
 
 Encode for streaming: cap the bitrate and put the index at the front with
 `-movflags +faststart`, or playback will wait for the whole file.
