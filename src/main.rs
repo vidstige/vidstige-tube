@@ -1,4 +1,5 @@
-//! Serves one page, and hands out signed links to a private video store.
+//! `tube serve` serves one page and hands out signed links to a private
+//! video store; `tube upload` puts a video there.
 //!
 //! Nothing in the bucket is readable without a signature, so the only
 //! way to a video is through here: the page asks for an id, this signs
@@ -10,10 +11,12 @@
 //! The signing key is a service account key mounted as a file, from
 //! Secret Manager in production, so nothing here talks to a secret store.
 
+mod dotenv;
 mod http;
 mod key;
 mod signed_url;
 mod timestamp;
+mod upload;
 
 use std::env;
 use std::fs;
@@ -72,7 +75,7 @@ fn page() -> Response {
     }
 }
 
-fn main() {
+fn serve() {
     let bucket = env::var("TUBE_BUCKET").expect("TUBE_BUCKET is not set");
     let key_file = env::var("TUBE_KEY").unwrap_or(DEFAULT_KEY_FILE.into());
     let lifetime = env_or("TUBE_LINK_SECONDS", DEFAULT_LINK_SECONDS);
@@ -85,4 +88,18 @@ fn main() {
         Some(_) => Response { status: 404, headers: vec![], body: vec![] },
         None => page(),
     })
+}
+
+fn main() {
+    dotenv::load();
+    let args: Vec<String> = env::args().collect();
+    match args.iter().map(String::as_str).collect::<Vec<_>>()[1..] {
+        ["serve"] => serve(),
+        ["upload", file] => upload::upload(file, None),
+        ["upload", file, title] => upload::upload(file, Some(title)),
+        _ => {
+            eprintln!("usage: tube serve | tube upload FILE [TITLE]");
+            std::process::exit(2);
+        }
+    }
 }

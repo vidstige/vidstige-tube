@@ -35,17 +35,20 @@ Copy `.env.example` to `.env` and fill it in. Then:
 
 To run locally, point `TUBE_KEY` at a signer key file. The one in
 `testdata/` is a throwaway that signs links no bucket will honour, but it
-is enough to see the page:
+is enough to see the page. The bucket comes from `.env`:
 
 ```bash
-TUBE_BUCKET=BUCKET TUBE_KEY=key.json cargo run
+TUBE_KEY=testdata/signer.json cargo run -- serve
 ```
 
 ## Uploading videos
 
 ```bash
-./upload.sh film.mp4 "Some film"   # prints the link
+cargo run -- upload film.mp4 "Some film"   # prints the link
 ```
+
+This copies through `gcloud`, so it uses whatever account `gcloud auth`
+is logged in as.
 
 Encode for streaming: cap the bitrate and put the index at the front with
 `-movflags +faststart`, or playback will wait for the whole file.
