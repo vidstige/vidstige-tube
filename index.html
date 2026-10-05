@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>·</title>
+<style>
+  :root { --ink: #ebf3ff; --dim: #46566b; --ground: #06080c; }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: var(--ground);
+    color: var(--ink);
+    font: 15px/1.5 "Avenir Next", Avenir, system-ui, sans-serif;
+  }
+  body { display: grid; place-items: center; }
+  main { width: 100%; max-width: 1180px; padding: 24px; }
+  video { width: 100%; display: block; background: #000; border-radius: 3px; }
+  h1 { font-size: 20px; font-weight: 500; margin: 18px 0 4px; }
+  p { color: var(--dim); margin: 0; font-size: 14px; }
+  /* Nothing here says what this is, or what else there might be. */
+  .nothing { color: var(--dim); font-size: 42px; text-align: center; user-select: none; }
+</style>
+</head>
+<body>
+<main id="view"><div class="nothing">·</div></main>
+<script>
+const ID = /^[A-Za-z0-9]{6,32}$/;
+
+// The id is the path, so a link carries nothing else. ?v= works too.
+const path = location.pathname.replace(/^\/+|\/+$/g, "");
+const id = ID.test(path) ? path : new URLSearchParams(location.search).get("v");
+
+if (id && ID.test(id)) {
+  const view = document.getElementById("view");
+  // The store is private; this asks the server to sign a way in.
+  fetch(`/s/${encodeURIComponent(id)}`)
+    .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+    .then(async (links) => {
+      view.innerHTML =
+        `<video controls autoplay playsinline preload="metadata"></video>` +
+        `<h1 id="t"></h1><p id="m"></p>`;
+      view.querySelector("video").src = links.video;
+      const meta = await fetch(links.meta).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
+      if (meta.title) {
+        document.title = meta.title;
+        document.getElementById("t").textContent = meta.title;
+      }
+      if (meta.meta) document.getElementById("m").textContent = meta.meta;
+    })
+    .catch(() => {
+      view.innerHTML = `<div class="nothing">·</div>`;
+    });
+}
+</script>
+</body>
+</html>
