@@ -63,6 +63,14 @@ fn links(signer: &Signer, bucket: &str, lifetime: u64, id: &str) -> Response {
     }
 }
 
+fn health() -> Response {
+    Response {
+        status: 200,
+        headers: vec![("content-type", "text/plain")],
+        body: b"ok\n".to_vec(),
+    }
+}
+
 fn page() -> Response {
     Response {
         status: 200,
@@ -86,6 +94,7 @@ fn serve() {
     http::serve(port, move |path| match path.strip_prefix("/s/") {
         Some(id) if is_id(id) => links(&signer, &bucket, lifetime, id),
         Some(_) => Response { status: 404, headers: vec![], body: vec![] },
+        None if path == "/health" => health(),
         None => page(),
     })
 }
